@@ -1,2 +1,2 @@
 # Language Identification Keras
-Language identification project. 38 language supported.
+Language identification project. 38 languages supported.
