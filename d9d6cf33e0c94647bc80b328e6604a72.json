@@ -1,0 +1,267 @@
+{
+  "node": [
+    {
+      "name": "embedding_1_input",
+      "op": "DataInput",
+      "attr": {
+        "dtype": {
+          "type": "DT_FLOAT32"
+        },
+        "_output_shapes": {
+          "list": {
+            "shape": [
+              {
+                "dim": [
+                  {
+                    "size": "-1"
+                  },
+                  {
+                    "size": "50"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "shape": {
+          "shape": {
+            "dim": [
+              {
+                "size": "-1"
+              },
+              {
+                "size": "50"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "embedding_1",
+      "op": "Embedding",
+      "input": [
+        "embedding_1_input"
+      ],
+      "attr": {
+        "dtype": {
+          "type": "DT_FLOAT32"
+        },
+        "_output_shapes": {
+          "list": {
+            "shape": [
+              {
+                "dim": [
+                  {
+                    "size": "-1"
+                  },
+                  {
+                    "size": "50"
+                  },
+                  {
+                    "size": "50"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "input_dim": {
+          "i": "5202"
+        },
+        "output_dim": {
+          "i": "50"
+        },
+        "mask_zero": {
+          "b": false
+        }
+      }
+    },
+    {
+      "name": "lstm_1",
+      "op": "LSTM",
+      "input": [
+        "embedding_1"
+      ],
+      "attr": {
+        "_output_shapes": {
+          "list": {
+            "shape": [
+              {
+                "dim": [
+                  {
+                    "size": "-1"
+                  },
+                  {
+                    "size": "50"
+                  },
+                  {
+                    "size": "56"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "units": {
+          "i": "56"
+        },
+        "use_bias": {
+          "b": true
+        },
+        "dropout": {
+          "f": 0.1
+        },
+        "recurrent_dropout": {
+          "f": 0.1
+        }
+      }
+    },
+    {
+      "name": "lstm_1_activation",
+      "op": "Tanh",
+      "input": [
+        "lstm_1"
+      ],
+      "attr": {
+        "_output_shapes": {
+          "list": {
+            "shape": [
+              {
+                "dim": [
+                  {
+                    "size": "-1"
+                  },
+                  {
+                    "size": "50"
+                  },
+                  {
+                    "size": "56"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "lstm_2",
+      "op": "LSTM",
+      "input": [
+        "lstm_1_activation"
+      ],
+      "attr": {
+        "_output_shapes": {
+          "list": {
+            "shape": [
+              {
+                "dim": [
+                  {
+                    "size": "-1"
+                  },
+                  {
+                    "size": "56"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "units": {
+          "i": "56"
+        },
+        "use_bias": {
+          "b": true
+        },
+        "dropout": {
+          "f": 0.1
+        },
+        "recurrent_dropout": {
+          "f": 0.1
+        }
+      }
+    },
+    {
+      "name": "lstm_2_activation",
+      "op": "Tanh",
+      "input": [
+        "lstm_2"
+      ],
+      "attr": {
+        "_output_shapes": {
+          "list": {
+            "shape": [
+              {
+                "dim": [
+                  {
+                    "size": "-1"
+                  },
+                  {
+                    "size": "56"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "dense_1",
+      "op": "FullyConnected",
+      "input": [
+        "lstm_2_activation"
+      ],
+      "attr": {
+        "_output_shapes": {
+          "list": {
+            "shape": [
+              {
+                "dim": [
+                  {
+                    "size": "-1"
+                  },
+                  {
+                    "size": "38"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "units": {
+          "i": "38"
+        },
+        "use_bias": {
+          "b": true
+        }
+      }
+    },
+    {
+      "name": "dense_1_activation",
+      "op": "Softmax",
+      "input": [
+        "dense_1"
+      ],
+      "attr": {
+        "_output_shapes": {
+          "list": {
+            "shape": [
+              {
+                "dim": [
+                  {
+                    "size": "-1"
+                  },
+                  {
+                    "size": "38"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

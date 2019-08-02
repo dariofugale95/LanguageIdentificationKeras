@@ -9,7 +9,6 @@ import random
 import os 
 
 class DataReader(object):
-    """description of class"""
     def __init__(self, data_directory_path):
         self.data_directory_path = data_directory_path
         self.list_dataset_files = sorted(os.listdir(data_directory_path))
@@ -28,7 +27,7 @@ class DataReader(object):
             except Exception as ex:
                 print("Error: ", ex)
         return list_all_data
-
+    
     def _split_data(self):
         list_all_data = self._read_data_files()
         english_texts, langx_texts, list_labels = [],[],[]
@@ -78,7 +77,6 @@ class DataReader(object):
         if(shuffle):
             _data, _labels = self._shuffle_data(_data, _labels)
 
-
         self.data = _data
         self.labels= _labels
         return self.data, self.labels
@@ -109,14 +107,15 @@ class DataReader(object):
         self.label = labels_list
         return self.data, self.label
 
+
 class DataGenerator():
     def __init__(self, data, labels): 
         self.data = data
         self.labels = labels
         self.max_seq_len = 0 
         
-        self.word_to_index = {} # {"Hello":1, "World":2,....}
-        self.index_to_word = {} # {1:"Hello", 2:"World",....}
+        self.char_to_index = {}
+        self.index_to_char = {} 
     
         self.X_data = []
         self.y_data = []
@@ -128,29 +127,28 @@ class DataGenerator():
     def get_max_seq_len(self):
         return self.max_seq_len
 
-    def _create_word_vocabulary(self):
+    def _create_vocabulary(self):
         for text in self.data:
-            words = text.split(sep=" ")
-            self._update_max_seq_len(len(words))
-            for word in words:
-                if word not in self.word_to_index:
-                    self.word_to_index[word] = len(self.word_to_index)+1
-                    self.index_to_word[len(self.word_to_index)+1] = word 
+            self._update_max_seq_len(len(text))
+            for char in text:
+                if char not in self.char_to_index:
+                    self.char_to_index[char] = len(self.char_to_index)+1
+                    self.index_to_char[len(self.char_to_index)+1] = char 
                     
     def generate_data(self):
-        self._create_word_vocabulary()
+        self._create_vocabulary()
 
         #initialize X_data 
         self.X_data = np.zeros((len(self.data), self.get_max_seq_len()), dtype='float32') 
 
         for n_sample_text, text in enumerate(self.data):
-            for word_idx, word in enumerate(text.split()):
-                self.X_data[n_sample_text, word_idx] = self.word_to_index[word]
+            for char_idx, char in enumerate(text):
+                self.X_data[n_sample_text, char_idx] = self.char_to_index[char]
 
         # normalize data
         # standard_scaler = preprocessing.StandardScaler().fit(self.X_data)
         # self.X_data = standard_scaler.transform(self.X_data)   
-        
+
         # one-hot targets 
         self.y_data = to_categorical(self.labels, num_classes=None)
 
@@ -169,13 +167,10 @@ class DataGenerator():
             pickle.dump(X_te, f_pickle, protocol=pickle.HIGHEST_PROTOCOL)
             pickle.dump(y_tr, f_pickle, protocol=pickle.HIGHEST_PROTOCOL)
             pickle.dump(y_te, f_pickle, protocol=pickle.HIGHEST_PROTOCOL)
-            pickle.dump(self.word_to_index, f_pickle, protocol=pickle.HIGHEST_PROTOCOL)
-            pickle.dump(self.index_to_word, f_pickle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    def save_vocabularies(self):
+        with open(env().path_to_vocabularies, 'wb') as f_pickle:
+            pickle.dump(self.char_to_index, f_pickle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(self.index_to_char, f_pickle, protocol=pickle.HIGHEST_PROTOCOL)
             pickle.dump(self.max_seq_len, f_pickle, protocol = pickle.HIGHEST_PROTOCOL)
-
-
-
-    
-
-        
 
